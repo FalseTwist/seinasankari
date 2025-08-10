@@ -1,0 +1,172 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeinäSankari Åbo - Häng upp enkelt!</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+        .section-padding {
+            padding: 3rem 1rem;
+        }
+        .btn-primary {
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        .shadow-custom {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .hero-image {
+            max-width: 600px;
+            width: 100%;
+            height: auto;
+        }
+        .lang-link {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: #ffffff;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-blue-700 text-white py-6 shadow-lg relative">
+        <div class="container mx-auto text-center">
+            <a href="index.html" class="lang-link">Suomeksi</a>
+            <h1 class="text-4xl font-bold tracking-tight">SeinäSankari Åbo</h1>
+            <p class="text-lg mt-2">Professionell hjälp med att hänga upp tavlor och hyllor i Åbo med omnejd</p>
+        </div>
+    </header>
+
+    <!-- Contact Info Section -->
+    <section class="bg-blue-100 py-4">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-2xl font-semibold mb-2 text-gray-800">Kontaktuppgifter</h2>
+            <p class="text-lg text-gray-700">Telefon: +358 40 8247807</p>
+            <p class="text-lg text-gray-700">E-post: <a href="mailto:info@seinasankari.fi" class="text-blue-700 underline">info@seinasankari.fi</a></p>
+        </div>
+    </section>
+
+    <!-- Hero Section -->
+    <section class="section-padding bg-gray-100">
+        <div class="container mx-auto px-4 text-center">
+            <img src="https://images.pexels.com/photos/1090638/pexels-photo-1090638.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Person installerar en hylla på väggen" class="hero-image mx-auto mb-6 rounded-lg shadow-custom">
+            <h2 class="text-3xl font-semibold mb-4 text-gray-800">Häng upp enkelt och säkert!</h2>
+            <p class="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">SeinäSankari Åbo sköter installationen av tavlor, hyllor och andra väggfästen med professionalitet i Åbo och närliggande kommuner. Spara tid och njut av ett snyggt resultat!</p>
+            <a href="#kontakta-oss" class="btn-primary bg-blue-700 text-white px-8 py-3 rounded-lg text-lg font-medium">Boka ett besök nu</a>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="section-padding bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-semibold text-center mb-8 text-gray-800">Våra tjänster</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <h3 class="text-xl font-medium text-gray-800">Upphängning av tavlor</h3>
+                    <p class="text-gray-600">Vi hänger upp dina tavlor exakt och säkert på önskad plats.</p>
+                </div>
+                <div class="text-center">
+                    <h3 class="text-xl font-medium text-gray-800">Installation av hyllor</h3>
+                    <p class="text-gray-600">Vi monterar hyllor stadigt och stilfullt enligt dina behov.</p>
+                </div>
+                <div class="text-center">
+                    <h3 class="text-xl font-medium text-gray-800">Skräddarsydda uppdrag efter kundens önskemål</h3>
+                    <p class="text-gray-600">Vi utför väggmonteringar enligt dina specifika behov och önskemål.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="section-padding bg-gray-100">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-semibold mb-4 text-gray-800">Prissättning</h2>
+            <p class="text-lg text-gray-700 mb-2 font-medium">Pris: 49 €/timme (inkl. moms)</p>
+            <p class="text-lg text-gray-700 mb-6 font-medium">Kilometerersättning: 0,53 €/km (över 15 km från Åbo)</p>
+            <p class="text-gray-600 max-w-xl mx-auto">Priset inkluderar professionellt besök, borrning och installation i Åbo och närliggande kommuner. Minimidebitering 1 timme.</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="kontakta-oss" class="section-padding bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-semibold text-center mb-8 text-gray-800">Kontakta oss</h2>
+            <div class="max-w-lg mx-auto bg-gray-50 p-6 rounded-lg shadow-custom">
+                <form action="https://formspree.io/f/your-form-id" method="POST" class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Namn</label>
+                        <input type="text" id="name" name="name" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700" required>
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">E-post</label>
+                        <input type="email" id="email" name="email" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700" required>
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700">Telefonnummer</label>
+                        <input type="tel" id="phone" name="phone" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700" required>
+                    </div>
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-700">Meddelande</label>
+                        <textarea id="message" name="message" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="w-full btn-primary bg-blue-700 text-white p-3 rounded-lg">Skicka</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-blue-700 text-white py-6">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2025 SeinäSankari Åbo. Alla rättigheter förbehålls.</p>
+        </div>
+    </footer>
+</body>
+</html>
